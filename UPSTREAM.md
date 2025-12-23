@@ -4,19 +4,21 @@ This plugin was forked from [oh-my-opencode](https://github.com/code-yeongyu/oh-
 
 ## Base Version
 
-- **Repository**: https://github.com/code-yeongyu/oh-my-opencode
+- **Repository**: <https://github.com/code-yeongyu/oh-my-opencode>
 - **Version**: v2.4.5 (forked on Dec 23, 2025)
 - **License**: MIT
 
 ## Philosophy Differences
 
 **oh-my-opencode** is designed as a batteries-included, widely-distributed plugin for the OpenCode community. It prioritizes:
+
 - Plug-and-play installation for new users
 - Sensible defaults that work for everyone
 - Pre-compiled TypeScript agents for easy distribution
 - Comprehensive feature set enabled by default
 
 **the-sidekicks** is a personal configuration system prioritizing:
+
 - Direct editability and transparency
 - Agents as markdown files in dotfiles (not compiled TypeScript)
 - Customization over distribution
@@ -38,14 +40,19 @@ This plugin was forked from [oh-my-opencode](https://github.com/code-yeongyu/oh-
 ### 2. Removed Features
 
 **Removed entirely:**
+
 - Google Auth (built-in OAuth implementation)
   - **Why**: External `opencode-antigravity-auth` plugin is superior (multi-account load balancing, more models)
   - **Alternative**: User configures via external plugin
 - Claude Code compatibility layer defaults
   - **Why**: Personal use doesn't need legacy compatibility
   - **Alternative**: Can be re-enabled if needed
+- Environment Context Injector hook (`env-context-injector`)
+  - **Why**: OpenCode core already injects environment context (working directory, git status, platform, date, file tree) into ALL agents including subagents via `SystemPrompt.environment()`. Our hook only added time/timezone/locale on top, which duplicated most fields and provided marginal value for coding tasks.
+  - **Investigation**: See OpenCode's `packages/opencode/src/session/system.ts` and `packages/opencode/src/session/prompt.ts:535` - environment is injected unconditionally for all agent types.
 
 **Simplified:**
+
 - Auto-update checker → Removed
 - Startup toast → Removed
 - Feature advertising → Removed
@@ -70,6 +77,7 @@ This plugin was forked from [oh-my-opencode](https://github.com/code-yeongyu/oh-
 ### 5. Tool Modifications
 
 **Kept from upstream:**
+
 - LSP tools (hover, goto, rename, etc.)
 - AST-grep tools
 - Background task manager
@@ -78,6 +86,7 @@ This plugin was forked from [oh-my-opencode](https://github.com/code-yeongyu/oh-
 - All hooks (todo enforcer, comment checker, etc.)
 
 **Modified:**
+
 - Grep/glob tool replacements with timeout handling
 - Tool output truncation logic
 - Context window management
@@ -87,6 +96,7 @@ This plugin was forked from [oh-my-opencode](https://github.com/code-yeongyu/oh-
 ## What We Kept (and Why)
 
 ### Core Infrastructure ✅
+
 - **Hooks system**: Todo continuation, comment checking, context monitoring
 - **Background agent system**: Parallel agent orchestration
 - **Tool suite**: LSP, AST-grep, enhanced grep/glob
@@ -94,6 +104,7 @@ This plugin was forked from [oh-my-opencode](https://github.com/code-yeongyu/oh-
 - **Claude Code compatibility layer**: Useful for importing existing configs
 
 ### Why These Work for Personal Use
+
 - Infrastructure code rarely needs editing
 - Features directly improve agent productivity
 - No compromise needed between distribution and customization
@@ -101,6 +112,7 @@ This plugin was forked from [oh-my-opencode](https://github.com/code-yeongyu/oh-
 ## Upstream Sync Strategy
 
 **When to check upstream:**
+
 - Monthly check for new features
 - When encountering bugs that might be fixed upstream
 - When new OpenCode versions require plugin updates
@@ -132,17 +144,12 @@ git log upstream/dev --oneline --since="1 month ago"
 
 Even though agents are markdown, we kept some dynamic behavior:
 
-1. **Environment context injection** (`src/agents/utils.ts`)
-   - Adds current date/time/platform to Professor & Rocket prompts
-   - Runs at plugin load time
-   - Agents get fresh context each session
-
-2. **Model-specific adaptations** (`src/agents/professor.ts`, `src/agents/oracle.ts`)
+1. **Model-specific adaptations** (`src/agents/professor.ts`, `src/agents/oracle.ts`)
    - GPT models get `reasoningEffort` parameter
    - Claude models get `thinking` budget
    - Allows using same agent with different models
 
-3. **Tool restrictions** (`src/index.ts`)
+2. **Tool restrictions** (`src/index.ts`)
    - Tracer/Rocket can't use `call_sidekick` (prevents recursion)
    - Specter can't use `task`, `call_sidekick`, `look_at`
    - Applied programmatically during config injection
@@ -150,6 +157,7 @@ Even though agents are markdown, we kept some dynamic behavior:
 ### What We Moved to Markdown
 
 Agent **prompts** are now in `agents/*.md`:
+
 - Professor's orchestration instructions
 - Oracle's reasoning framework
 - Rocket's research methodology
@@ -163,6 +171,7 @@ These are the "personality" of each agent—should be directly editable.
 ### What Stayed in TypeScript
 
 Plugin **infrastructure** remains in `src/`:
+
 - Hook implementations
 - Tool definitions
 - Background task manager
@@ -184,6 +193,7 @@ When oh-my-opencode releases a new version:
 5. Update this document with what you merged and why
 
 **Quick merge workflow:**
+
 ```bash
 # See what changed
 git log upstream/dev..HEAD --oneline
@@ -196,6 +206,7 @@ git checkout upstream/dev -- src/hooks/some-hook.ts
 ```
 
 **Testing after merge:**
+
 ```bash
 bun run build
 opencode  # Verify plugin loads
@@ -205,6 +216,7 @@ opencode  # Verify plugin loads
 ## Attribution
 
 This project is deeply grateful to [@code-yeongyu](https://github.com/code-yeongyu) and the oh-my-opencode contributors for:
+
 - Exceptional engineering of the base plugin
 - Comprehensive hook system
 - Advanced LSP/AST tool integration

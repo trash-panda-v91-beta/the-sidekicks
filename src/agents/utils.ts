@@ -54,39 +54,6 @@ function loadMarkdownAgent(agentName: BuiltinAgentName, model?: string): AgentCo
   return config
 }
 
-export function createEnvContext(directory: string): string {
-  const now = new Date()
-  const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone
-  const locale = Intl.DateTimeFormat().resolvedOptions().locale
-
-  const dateStr = now.toLocaleDateString("en-US", {
-    weekday: "short",
-    year: "numeric",
-    month: "short",
-    day: "numeric",
-  })
-
-  const timeStr = now.toLocaleTimeString("en-US", {
-    hour: "2-digit",
-    minute: "2-digit",
-    second: "2-digit",
-    hour12: true,
-  })
-
-  const platform = process.platform as "darwin" | "linux" | "win32" | string
-
-  return `
-Here is some useful information about the environment you are running in:
-<env>
-  Working directory: ${directory}
-  Platform: ${platform}
-  Today's date: ${dateStr} (NOT 2024, NEVEREVER 2024)
-  Current time: ${timeStr}
-  Timezone: ${timezone}
-  Locale: ${locale}
-</env>`
-}
-
 function mergeAgentConfig(
   base: AgentConfig,
   override: AgentOverrideConfig
@@ -97,7 +64,7 @@ function mergeAgentConfig(
 export function createBuiltinAgents(
   disabledAgents: BuiltinAgentName[] = [],
   agentOverrides: AgentOverrides = {},
-  directory?: string,
+  _directory?: string,
   systemDefaultModel?: string
 ): Record<string, AgentConfig> {
   const result: Record<string, AgentConfig> = {}
@@ -120,11 +87,6 @@ export function createBuiltinAgents(
     const model = override?.model ?? (agentName === "Professor" ? systemDefaultModel : undefined)
 
     let config = loadMarkdownAgent(agentName, model)
-
-    if ((agentName === "Professor" || agentName === "rocket") && directory && config.prompt) {
-      const envContext = createEnvContext(directory)
-      config = { ...config, prompt: config.prompt + envContext }
-    }
 
     if (override) {
       config = mergeAgentConfig(config, override)
