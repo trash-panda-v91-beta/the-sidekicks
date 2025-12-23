@@ -5,7 +5,7 @@ This plugin was forked from [oh-my-opencode](https://github.com/code-yeongyu/oh-
 ## Base Version
 
 - **Repository**: <https://github.com/code-yeongyu/oh-my-opencode>
-- **Version**: v2.4.5 (forked on Dec 23, 2025)
+- **Version**: v2.4.5 (forked on Dec 23, 2025), synced to v2.4.6 (Dec 23, 2025)
 - **License**: MIT
 
 ## Philosophy Differences
@@ -212,6 +212,32 @@ bun run build
 opencode  # Verify plugin loads
 # Test the specific feature you merged
 ```
+
+## Sync Log
+
+### Dec 23, 2025 - Cherry-picked v2.4.6 fixes
+
+**Merged commits:**
+
+- `8495be6` - Enhance non-interactive-env hook with additional env vars and command patterns
+  - Added `npm_config_yes`, `PIP_NO_INPUT`, `YARN_ENABLE_IMMUTABLE_INSTALLS` env vars
+  - Added `SHELL_COMMAND_PATTERNS` documentation for banned/good/bad patterns
+- `61740e5` - feat(non-interactive-env): add banned command detection using SHELL_COMMAND_PATTERNS
+  - Detects and warns about interactive commands (vim, nano, less, etc.)
+  - Prevents agents from running commands that would hang
+- `e752032` - fix(look-at): use direct file passthrough instead of Read tool
+  - Files now passed directly via `file://` URL format
+  - Removed dependency on Read tool for multimodal-looker agent
+  - Added `inferMimeType` helper for proper MIME type detection
+  - Better performance for media file analysis
+
+**Skipped from v2.5.0/v2.5.1:**
+
+- CLI interactive install command (distribution feature)
+- Docs updates for Antigravity provider (not used)
+- npm packaging fixes (distribution feature)
+
+---
 
 ## Attribution
 
