@@ -1,0 +1,54 @@
+{
+  "name": "the-sidekicks",
+  "version": "0.1.0",
+  "description": "The Sidekicks - Professor's elite AI coding squad for OpenCode",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "type": "module",
+  "files": [
+    "dist"
+  ],
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "scripts": {
+    "build": "bun build src/index.ts --outdir dist --target bun --format esm --external @ast-grep/napi",
+    "clean": "rm -rf dist",
+    "typecheck": "tsc --noEmit",
+    "test": "bun test"
+  },
+  "keywords": [
+    "opencode",
+    "plugin",
+    "agents",
+    "ai",
+    "llm",
+    "sidekicks"
+  ],
+  "author": "trash-panda-v91-beta",
+  "license": "MIT",
+  "dependencies": {
+    "@ast-grep/cli": "^0.40.0",
+    "@ast-grep/napi": "^0.40.0",
+    "@code-yeongyu/comment-checker": "^0.6.0",
+    "@opencode-ai/plugin": "^1.0.162",
+    "js-yaml": "^4.1.1",
+    "picomatch": "^4.0.2",
+    "xdg-basedir": "^5.1.0",
+    "zod": "^4.1.8"
+  },
+  "devDependencies": {
+    "@types/js-yaml": "^4.0.9",
+    "@types/picomatch": "^3.0.2",
+    "bun-types": "latest",
+    "typescript": "^5.7.3"
+  },
+  "trustedDependencies": [
+    "@ast-grep/cli",
+    "@ast-grep/napi",
+    "@code-yeongyu/comment-checker"
+  ]
+}
