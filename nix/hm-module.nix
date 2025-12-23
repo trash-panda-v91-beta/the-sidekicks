@@ -10,7 +10,7 @@
 #   imports = [ inputs.the-sidekicks.homeManagerModules.default ];
 #   programs.opencode-sidekicks.enable = true;
 #
-{ self }:
+{ self, opencode }:
 {
   config,
   lib,
@@ -21,6 +21,7 @@ let
   cfg = config.programs.opencode-sidekicks;
 
   sidekicksPackage = self.packages.${pkgs.system}.opencode-sidekicks;
+  opencodePackage = opencode.packages.${pkgs.system}.default;
 
   agentFiles = builtins.readDir "${sidekicksPackage}/agents";
   agentNames = builtins.filter (name: lib.hasSuffix ".md" name) (builtins.attrNames agentFiles);
@@ -295,9 +296,9 @@ in
     };
 
     opencodePackage = lib.mkOption {
-      type = lib.types.nullOr lib.types.package;
-      default = null;
-      description = "The OpenCode package to use. If null, uses the default from programs.opencode";
+      type = lib.types.package;
+      default = opencodePackage;
+      description = "The OpenCode package to use. Defaults to the version bundled with this flake.";
       example = lib.literalExpression "pkgs.opencode";
     };
 
@@ -419,7 +420,7 @@ in
 
     programs.opencode = {
       enable = true;
-      package = lib.mkIf (cfg.opencodePackage != null) cfg.opencodePackage;
+      package = cfg.opencodePackage;
 
       settings = lib.mkMerge [
         {

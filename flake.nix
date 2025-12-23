@@ -4,6 +4,7 @@
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
     flake-utils.url = "github:numtide/flake-utils";
+    opencode.url = "github:sst/opencode/dev";
   };
 
   outputs =
@@ -11,10 +12,11 @@
       self,
       nixpkgs,
       flake-utils,
+      opencode,
     }:
     let
       # Home-manager module (system-agnostic)
-      hmModule = import ./nix/hm-module.nix { inherit self; };
+      hmModule = import ./nix/hm-module.nix { inherit self opencode; };
     in
     flake-utils.lib.eachDefaultSystem (
       system:
@@ -24,6 +26,8 @@
       {
         packages = {
           default = self.packages.${system}.opencode-sidekicks;
+
+          opencode = opencode.packages.${system}.default;
 
           opencode-sidekicks = pkgs.stdenv.mkDerivation {
             pname = "opencode-sidekicks";
