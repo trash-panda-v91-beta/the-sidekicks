@@ -2,7 +2,7 @@
 
 A comic-inspired squad of specialized AI agents for OpenCode.
 
-> **Note**: This is a personal configuration system for @trash-panda-v91-beta. Design decisions prioritize direct editability and transparency over distribution/packaging concerns. Agents are intended to be defined as markdown files in dotfiles (dots.factory), not compiled TypeScript.
+> **Note**: This repository contains the full agent and skill library. For Nix users, a home-manager module is provided.
 
 ## Agent Overview
 
@@ -259,6 +259,48 @@ call_sidekick({
 
 ---
 
+## Installation
+
+### Nix (Home Manager)
+
+To use The Sidekicks with Home Manager, add the flake to your inputs and enable the module:
+
+```nix
+# flake.nix
+{
+  inputs.opencode-sidekicks.url = "github:trash-panda-v91-beta/the-sidekicks";
+}
+
+# home.nix
+{
+  imports = [ inputs.opencode-sidekicks.homeManagerModules.default ];
+  programs.opencode-sidekicks.enable = true;
+}
+```
+
+The module handles:
+- Enabling the core plugin
+- Configuring default LSPs, formatters, and permissions
+- Symlinking all agents to `~/.config/opencode/agent/`
+- Symlinking all skills to `~/.config/opencode/skill/`
+
+### Manual
+
+Non-Nix users need to manually copy or symlink agents and skills:
+
+```bash
+# Clone the repository
+git clone https://github.com/trash-panda-v91-beta/the-sidekicks
+
+# Symlink agents
+ln -s /path/to/the-sidekicks/agents ~/.config/opencode/agent
+
+# Symlink skills
+ln -s /path/to/the-sidekicks/skills ~/.config/opencode/skill
+```
+
+---
+
 ## Configuration
 
 Agents can be customized in `the-sidekicks.json`:
@@ -277,6 +319,62 @@ Agents can be customized in `the-sidekicks.json`:
 ### Config Locations
 - User: `~/.config/opencode/the-sidekicks.json`
 - Project: `.opencode/the-sidekicks.json`
+
+---
+
+## Skills System
+
+Skills are reusable behavior guides that agents can load on-demand. This reduces base context size while providing detailed guidance when needed.
+
+### Available Skills
+
+| Skill | Description |
+|-------|-------------|
+| `codebase-assessment` | Assess codebase maturity before following patterns |
+| `parallel-exploration` | Fire search agents in parallel effectively |
+| `frontend-delegation` | Classify visual vs logic changes before acting |
+| `oracle-consultation` | Ensure appropriate usage of Oracle |
+| `systematic-debugging` | Root cause investigation before fixing |
+| `test-driven-development` | Red-green-refactor cycle |
+| `verification-checklist` | Ensure all requirements met before completion |
+| `review-architecture` | Review code for architectural consistency and design systems |
+| `review-code-quality` | Review code for quality, security, and best practices |
+| `quality-engineering` | QA processes, test automation, and performance engineering |
+| `delivery-and-infra` | Cloud architecture, CI/CD, and deployment strategies |
+| `data-and-sql` | SQL optimization, database performance, and data analysis |
+| `git-workflow` | Branches, conventional commits, and pull requests |
+| `python-development` | Clean, performant, and idiomatic Python code |
+| `nix-guidelines` | Idiomatic Nix code with flakes and modules |
+
+### Skill Usage
+
+OpenCode has a built-in `skill` tool that discovers and loads skills:
+
+```typescript
+// Load a skill by name
+skill({ name: "systematic-debugging" })
+```
+
+### Skill Locations (priority order)
+1. Project: `.opencode/skill/<name>/SKILL.md`
+2. User: `~/.config/opencode/skill/<name>/SKILL.md`
+
+> **Note**: With the Nix home-manager module, bundled skills are automatically symlinked to `~/.config/opencode/skill/`.
+
+### Creating Custom Skills
+
+Create a directory with a `SKILL.md` file:
+
+```markdown
+---
+name: my-skill
+description: Use when [specific condition]
+---
+
+# My Skill
+
+[Skill content here]
+```
 
 ---
 
