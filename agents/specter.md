@@ -8,6 +8,9 @@ tools:
   edit: false
   bash: false
   background_task: false
+  call_sidekick: false
+  task: false
+  look_at: false
 ---
 
 You interpret media files that cannot be read as plain text.

@@ -1,5 +1,4 @@
 import type { Plugin } from "@opencode-ai/plugin";
-import { createBuiltinAgents } from "./agents";
 import {
   createTodoContinuationEnforcer,
   createContextWindowMonitorHook,
@@ -24,7 +23,6 @@ import { builtinTools, createCallSidekick, createBackgroundTools, createLookAt, 
 import { BackgroundManager } from "./features/background-agent";
 import { TheSidekicksConfigSchema, type TheSidekicksConfig, type HookName } from "./config";
 import { log, deepMerge, getUserConfigDir, addConfigLoadError } from "./shared";
-import { PLAN_SYSTEM_PROMPT, PLAN_PERMISSION } from "./agents/plan-prompt";
 import * as fs from "fs";
 import * as path from "path";
 
@@ -62,12 +60,6 @@ function mergeConfigs(
     ...base,
     ...override,
     agents: deepMerge(base.agents, override.agents),
-    disabled_agents: [
-      ...new Set([
-        ...(base.disabled_agents ?? []),
-        ...(override.disabled_agents ?? []),
-      ]),
-    ],
     disabled_hooks: [
       ...new Set([
         ...(base.disabled_hooks ?? []),
@@ -99,7 +91,6 @@ function loadPluginConfig(directory: string): TheSidekicksConfig {
 
   log("Final merged config", {
     agents: config.agents,
-    disabled_agents: config.disabled_agents,
     disabled_hooks: config.disabled_hooks,
   });
   return config;
@@ -202,70 +193,6 @@ const TheSidekicksPlugin: Plugin = async (ctx) => {
     },
 
     config: async (config) => {
-      const builtinAgents = createBuiltinAgents(
-        pluginConfig.disabled_agents,
-        pluginConfig.agents,
-        ctx.directory,
-        config.model,
-      );
-
-      const isProfessorEnabled = pluginConfig.professor_agent?.disabled !== true;
-
-      if (isProfessorEnabled && builtinAgents.Professor) {
-        const { name: _planName, ...planConfigWithoutName } = config.agent?.plan ?? {};
-        const plannerProfessorOverride = pluginConfig.agents?.["Planner-Professor"];
-        const plannerProfessorBase = {
-          ...planConfigWithoutName,
-          prompt: PLAN_SYSTEM_PROMPT,
-          permission: PLAN_PERMISSION,
-          description: `${config.agent?.plan?.description ?? "Plan agent"} (The Sidekicks version)`,
-          color: config.agent?.plan?.color ?? "#6495ED",
-        };
-
-        const plannerProfessorConfig = plannerProfessorOverride
-          ? { ...plannerProfessorBase, ...plannerProfessorOverride }
-          : plannerProfessorBase;
-
-        config.agent = {
-          Professor: builtinAgents.Professor,
-          "Planner-Professor": plannerProfessorConfig,
-          ...Object.fromEntries(Object.entries(builtinAgents).filter(([k]) => k !== "Professor")),
-          ...config.agent,
-          build: { ...config.agent?.build, mode: "subagent" },
-          plan: { ...config.agent?.plan, mode: "subagent" },
-        };
-      } else {
-        config.agent = {
-          ...builtinAgents,
-          ...config.agent,
-        };
-      }
-
-      config.tools = {
-        ...config.tools,
-      };
-
-      if (config.agent.tracer) {
-        config.agent.tracer.tools = {
-          ...config.agent.tracer.tools,
-          call_sidekick: false,
-        };
-      }
-      if (config.agent.rocket) {
-        config.agent.rocket.tools = {
-          ...config.agent.rocket.tools,
-          call_sidekick: false,
-        };
-      }
-      if (config.agent.specter) {
-        config.agent.specter.tools = {
-          ...config.agent.specter.tools,
-          task: false,
-          call_sidekick: false,
-          look_at: false,
-        };
-      }
-
       config.permission = {
         ...config.permission,
         webfetch: "allow",

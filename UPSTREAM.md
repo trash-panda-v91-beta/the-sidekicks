@@ -215,6 +215,51 @@ opencode  # Verify plugin loads
 
 ## Sync Log
 
+### Dec 23, 2025 - Refactored to use OpenCode native agent loading
+
+**Major architecture change:**
+
+Removed TypeScript agent loading in favor of OpenCode's native agent discovery system.
+
+**What changed:**
+
+| Before | After |
+|--------|-------|
+| Plugin loaded agents via `createBuiltinAgents()` | OpenCode loads from `~/.config/opencode/agent/` |
+| Tool restrictions set in TypeScript | Tool restrictions in agent frontmatter (`tools:`) |
+| Path resolution issues in Nix store | No path resolution needed |
+| `src/agents/` directory with utils, types, plan-prompt | Deleted entirely |
+| Planner-Professor created dynamically | `agents/Planner-Professor.md` static file |
+| Professor default via object ordering | `default_agent = "professor"` in HM module |
+
+**Files deleted:**
+- `src/agents/utils.ts` - Agent markdown loading logic
+- `src/agents/types.ts` - BuiltinAgentName types
+- `src/agents/plan-prompt.ts` - Planner-Professor prompt/permissions
+- `src/agents/index.ts` - Re-exports
+
+**Files added:**
+- `agents/Planner-Professor.md` - Read-only planning agent
+
+**Files modified:**
+- `agents/tracer.md` - Added `call_sidekick: false`
+- `agents/rocket.md` - Added `call_sidekick: false`
+- `agents/specter.md` - Added `call_sidekick: false`, `task: false`, `look_at: false`
+- `nix/hm-module.nix` - Added `default_agent = "professor"`
+- `src/index.ts` - Removed agent loading, simplified config hook
+
+**Result:**
+- Bundle size reduced 100KB (1.37MB → 1.27MB)
+- No more Nix store path resolution bugs
+- Agent configuration fully in markdown frontmatter
+- Aligns with OpenCode's native agent system
+
+**Breaking changes for users:**
+- `disabled_agents` config option no longer works; use `disable: true` in agent frontmatter instead
+- Agent names are now lowercase (`professor` not `Professor`) in config
+
+---
+
 ### Dec 23, 2025 - Cherry-picked v2.4.6 fixes
 
 **Merged commits:**

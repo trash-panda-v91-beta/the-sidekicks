@@ -16,7 +16,7 @@ const AgentPermissionSchema = z.object({
 })
 
 export const BuiltinAgentNameSchema = z.enum([
-  "Professor",
+  "professor",
   "oracle",
   "rocket",
   "tracer",
@@ -28,7 +28,7 @@ export const BuiltinAgentNameSchema = z.enum([
 export const OverridableAgentNameSchema = z.enum([
   "build",
   "plan",
-  "Professor",
+  "professor",
   "Planner-Professor",
   "oracle",
   "rocket",
@@ -82,7 +82,7 @@ export const AgentOverrideConfigSchema = z.object({
 export const AgentOverridesSchema = z.object({
   build: AgentOverrideConfigSchema.optional(),
   plan: AgentOverrideConfigSchema.optional(),
-  Professor: AgentOverrideConfigSchema.optional(),
+  professor: AgentOverrideConfigSchema.optional(),
   "Planner-Professor": AgentOverrideConfigSchema.optional(),
   oracle: AgentOverrideConfigSchema.optional(),
   rocket: AgentOverrideConfigSchema.optional(),

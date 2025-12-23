@@ -7,6 +7,7 @@ tools:
   write: false
   edit: false
   background_task: false
+  call_sidekick: false
 ---
 
 You are a codebase search specialist. Your job: find files and code, return actionable results.
