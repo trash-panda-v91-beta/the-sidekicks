@@ -425,7 +425,6 @@ in
         {
           plugin = [ cfg.package ];
           autoupdate = false;
-          default_agent = "professor";
         }
 
         (lib.mkIf cfg.defaults.lsp { lsp = defaultLspConfig; })
